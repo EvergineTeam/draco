@@ -763,6 +763,16 @@ if(EMSCRIPTEN AND DRACO_JS_GLUE)
       PRE_LINK_JS_SOURCES ${draco_pre_link_js_sources}
       POST_LINK_JS_SOURCES ${draco_post_link_js_sources})
   endif()
+
+  if(DRACO_TINY_DECODE_SHARED_LIB)
+    draco_add_library(
+      NAME draco_tiny_dec
+      TYPE STATIC
+      SOURCES ${draco_tiny_decode_shared_lib_sources} ${draco_decoder_src}
+      DEFINES ${draco_defines}
+      INCLUDES ${draco_include_paths}
+      LINK_FLAGS "-sWASM=1")
+  endif()
 else()
   # Standard Draco libs, encoder and decoder. Object collections that mirror the
   # Draco directory structure.
