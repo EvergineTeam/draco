@@ -1,3 +1,4 @@
 docs/_site
 build/
 build_wasm/
+.vscode/
