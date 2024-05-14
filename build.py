@@ -2,30 +2,37 @@ import os
 import sys
 import subprocess
 import argparse
+import shutil
 from pathlib import Path
 
 # AndroidNDKPath = "C:/APPS/android-ndk-r26d"
 # EmscriptenSDKPath = "C:/APPS/emsdk"
 
 def build_windows():
-    outPath = "build/windows"
+    compilePath = "build/windows"
     cmake_cmd = [
         "cmake",
-        "-B", outPath,
+        "-B", compilePath,
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
     ]
     result = subprocess.run(cmake_cmd)
     if result.returncode != 0:
         return
 
-    build_cmd = ["cmake", "--build", outPath, "--config", "Release",]
-    subprocess.run(build_cmd)
+    build_cmd = ["cmake", "--build", compilePath, "--config", "Release",]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+
+    dstPath = "build/OUT/runtimes/win-x64/nativeassets/netstandard2.0/draco_tiny_dec.dll"
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
 
 def build_uwp(arch):
-    outPath = f"build/uwp/{arch}"
+    compilePath = f"build/uwp/{arch}"
     cmake_cmd = [
         "cmake",
-        "-B", outPath,
+        "-B", compilePath,
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         "-DCMAKE_SYSTEM_NAME=WindowsStore",
         "-DCMAKE_SYSTEM_VERSION=10.0",
@@ -39,14 +46,22 @@ def build_uwp(arch):
     if result.returncode != 0:
         return
     
-    build_cmd = ["cmake", "--build", outPath, "--config", "Release", ]
-    subprocess.run(build_cmd)
+    build_cmd = ["cmake", "--build", compilePath, "--config", "Release", ]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+    
+    archStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}[arch]
+
+    dstPath = f"build/OUT/runtimes/win-{archStr}/nativeassets/uap10.0/draco_tiny_dec.dll"
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
 
 def build_wasm(EmscriptenSDKPath):
-    outPath = "build/wasm"
+    compilePath = "build/wasm"
     cmake_cmd = [
         "cmake",
-        "-B", outPath,
+        "-B", compilePath,
         "-GNinja",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
@@ -58,15 +73,20 @@ def build_wasm(EmscriptenSDKPath):
     if result.returncode != 0:
         return
 
-    build_cmd = ["cmake", "--build", outPath]
-    subprocess.run(build_cmd)
-
+    build_cmd = ["cmake", "--build", compilePath]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+    
+    dstPath = "build/OUT/build/wasm/draco_tiny_dec.a"
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(f"{compilePath}/libdraco_tiny_dec.a", dstPath)
 
 def build_android(AndroidNDKPath, abi, abiFolder):
-    outPath = f"build/android/{abiFolder}"
+    compilePath = f"build/android/{abiFolder}"
     cmake_cmd = [
         "cmake", ".",
-        "-B", outPath,
+        "-B", compilePath,
         "-G", "Ninja",
         f"-DCMAKE_TOOLCHAIN_FILE={AndroidNDKPath}/build/cmake/android.toolchain.cmake",
         "-DANDROID_TOOLCHAIN=clang",
@@ -83,14 +103,23 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     if result.returncode != 0:
         return
 
-    build_cmd = ["cmake", "--build", outPath]
-    subprocess.run(build_cmd)
+    build_cmd = ["cmake", "--build", compilePath]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
 
     strip_cmd = [
         f"{AndroidNDKPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip",
-        "-s", f"{outPath}/libdraco_tiny_dec.so"
+        "-s", f"{compilePath}/libdraco_tiny_dec.so"
     ]
-    subprocess.run(strip_cmd)
+    result = subprocess.run(strip_cmd)
+    if result.returncode != 0:
+        return
+    
+    dstPath = f"build/OUT/runtimes/android-{abiFolder}/native/draco_tiny_dec.so"
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(f"{compilePath}/libdraco_tiny_dec.so", dstPath)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
