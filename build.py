@@ -8,12 +8,15 @@ from pathlib import Path
 # AndroidNDKPath = "C:/APPS/android-ndk-r26d"
 # EmscriptenSDKPath = "C:/APPS/emsdk"
 
-def build_windows():
-    compilePath = "build/windows"
+archTransltionStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}
+
+def build_windows(arch):
+    compilePath = "build/windows/{arch}"
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-A", arch
     ]
     result = subprocess.run(cmake_cmd)
     if result.returncode != 0:
@@ -24,9 +27,33 @@ def build_windows():
     if result.returncode != 0:
         return
 
-    dstPath = "build/OUT/runtimes/win-x64/nativeassets/netstandard2.0/draco_tiny_dec.dll"
+    archStr = archTransltionStr[arch]
+
+    dstPath = f"build/OUT/runtimes/win-{archStr}/native/draco_tiny_dec.dll"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
+
+def build_mac(arch):
+    compilePath = f"build/mac/{arch}"
+    cmake_cmd = [
+        "cmake",
+        "-B", compilePath,
+        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-A", arch
+    ]
+    result = subprocess.run(cmake_cmd)
+    if result.returncode != 0:
+        return
+    
+    build_cmd = ["cmake", "--build", compilePath, ]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+    
+    dstPath = f"build/OUT/runtimes/osx-{arch}/native/draco_tiny_dec.dynlib"
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(f"{compilePath}/draco_tiny_dec.dynlib", dstPath)
 
 def build_uwp(arch):
     compilePath = f"build/uwp/{arch}"
@@ -51,7 +78,7 @@ def build_uwp(arch):
     if result.returncode != 0:
         return
     
-    archStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}[arch]
+    archStr = archTransltionStr[arch]
 
     dstPath = f"build/OUT/runtimes/win-{archStr}/nativeassets/uap10.0/draco_tiny_dec.dll"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
@@ -127,7 +154,12 @@ parser.add_argument("--emscripten_sdk", help = "Path to the Emscripten SDK insta
 parser.add_argument("--android_ndk", help = "Path to the Android NDK install dir")
 args = parser.parse_args()
 
-build_windows()
+if os.name == 'nt':
+    build_windows("Win32")
+    build_windows("x64")
+elif platform.system() == 'Darwin':
+    build_mac("x64")
+    build_mac("arm64")
 
 build_uwp("Win32")
 build_uwp("x64")
