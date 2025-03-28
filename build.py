@@ -52,9 +52,9 @@ def build_mac():
     if result.returncode != 0:
         return
     
-    dstPath = f"build/OUT/runtimes/osx-{arch}/native/draco_tiny_dec.dynlib"
+    dstPath = f"build/OUT/runtimes/osx-{arch}/native/draco_tiny_dec.dylib"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/draco_tiny_dec.dynlib", dstPath)
+    shutil.copy2(f"{compilePath}/draco_tiny_dec.dylib", dstPath)
 
 def build_uwp(arch):
     compilePath = f"build/uwp/{arch}"
