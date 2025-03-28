@@ -3,6 +3,7 @@ import sys
 import subprocess
 import argparse
 import shutil
+import platform
 from pathlib import Path
 
 # AndroidNDKPath = "C:/APPS/android-ndk-r26d"
@@ -161,10 +162,10 @@ elif platform.system() == 'Darwin':
     build_mac("x64")
     build_mac("arm64")
 
-build_uwp("Win32")
-build_uwp("x64")
-build_uwp("ARM")
-build_uwp("ARM64")
+#build_uwp("Win32")
+#build_uwp("x64")
+#build_uwp("ARM")
+#build_uwp("ARM64")
 
 if args.emscripten_sdk:
     build_wasm(args.emscripten_sdk)
