@@ -34,14 +34,14 @@ def build_windows(arch):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
 
-def build_mac(arch):
+def build_mac():
+    arch = "x64" if platform.machine() == "x86_64" else "arm64"
     compilePath = f"build/mac/{arch}"
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-A", arch
     ]
     result = subprocess.run(cmake_cmd)
     if result.returncode != 0:
@@ -159,8 +159,7 @@ if os.name == 'nt':
     build_windows("Win32")
     build_windows("x64")
 elif platform.system() == 'Darwin':
-    build_mac("x64")
-    build_mac("arm64")
+    build_mac()
 
 #build_uwp("Win32")
 #build_uwp("x64")
