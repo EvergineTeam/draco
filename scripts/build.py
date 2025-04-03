@@ -5,6 +5,7 @@ import argparse
 import shutil
 import platform
 from pathlib import Path
+abspath = os.path.abspath
 
 # AndroidNDKPath = "C:/APPS/android-ndk-r26d"
 # EmscriptenSDKPath = "C:/APPS/emsdk"
@@ -12,7 +13,7 @@ from pathlib import Path
 archTransltionStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}
 
 def rel_path(path):
-    return os.path.join(os.path.dirname(__file__), f"../{path}")
+    return abspath(os.path.join(os.path.dirname(__file__), f"../{path}"))
 
 def build_windows(arch):
     print(f"Building for Windows {arch}...\n")
@@ -96,9 +97,11 @@ def build_uwp(arch):
 
 def build_wasm(EmscriptenSDKPath):
     print("Building for WebAssembly...\n")
-    emsdk_env = os.path.join(EmscriptenSDKPath, "emsdk_env.bat")
+    emsdk_env = os.path.abspath(os.path.join(EmscriptenSDKPath, "emsdk_env.bat"))
     subprocess.run([emsdk_env])
 
+    toolchainFile = abspath(f"{EmscriptenSDKPath}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    crosscompilingEmulator = abspath(f"{EmscriptenSDKPath}/node/20.18.0_64bit/bin/node.exe")
     compilePath = rel_path("build/wasm")
     cmake_cmd = [
         "cmake",
@@ -106,12 +109,12 @@ def build_wasm(EmscriptenSDKPath):
         "-GNinja",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
-        f"-DCMAKE_TOOLCHAIN_FILE={EmscriptenSDKPath}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
-        f"-DCMAKE_CROSSCOMPILING_EMULATOR={EmscriptenSDKPath}/node/20.18.0_64bit/bin/node.exe",
+        f"-DCMAKE_TOOLCHAIN_FILE={toolchainFile}",
+        f"-DCMAKE_CROSSCOMPILING_EMULATOR={crosscompilingEmulator}",
         "-DDRACO_WASM=ON"
     ]
     if ninjaExePath:
-        ninjaExePath_absolute = os.path.abspath(ninjaExePath)
+        ninjaExePath_absolute = abspath(ninjaExePath)
         cmake_cmd.append(f"-DCMAKE_MAKE_PROGRAM={ninjaExePath_absolute}")
         
     result = subprocess.run(cmake_cmd)
@@ -123,7 +126,7 @@ def build_wasm(EmscriptenSDKPath):
     if result.returncode != 0:
         return
     
-    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.a")
+    srcPath = abspath(os.path.join(compilePath, "libdraco_tiny_dec.a"))
     dstPath = rel_path("build/OUT/runtimes/browser-wasm/draco_tiny_dec.a")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
@@ -147,7 +150,7 @@ def build_android(AndroidNDKPath, abi, abiFolder):
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON"
     ]
     if ninjaExePath:
-        ninjaExePath_absolute = os.path.abspath(ninjaExePath)
+        ninjaExePath_absolute = abspath(ninjaExePath)
         cmake_cmd.append(f"-DCMAKE_MAKE_PROGRAM={ninjaExePath_absolute}")
 
     result = subprocess.run(cmake_cmd)
@@ -199,7 +202,7 @@ if args.emscripten_sdk:
 
 if args.android_ndk:
     if not "JAVA_HOME" in os.environ:
-        java_path = os.path.abspath("openjdk")
+        java_path = abspath("openjdk")
         os.environ["JAVA_HOME"] = java_path
     build_android(args.android_ndk, "arm64-v8a", "arm64")
     build_android(args.android_ndk, "armeabi-v7a", "arm")
