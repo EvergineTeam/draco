@@ -99,6 +99,7 @@ def build_wasm(EmscriptenSDKPath):
     print("Building for WebAssembly...\n")
     emsdk_env = os.path.abspath(os.path.join(EmscriptenSDKPath, "emsdk_env.bat"))
     subprocess.run([emsdk_env])
+    os.environ["EMSCRIPTEN"] = abspath(os.path.join(EmscriptenSDKPath, "upstream", "emscripten"))
 
     toolchainFile = abspath(f"{EmscriptenSDKPath}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
     crosscompilingEmulator = abspath(f"{EmscriptenSDKPath}/node/20.18.0_64bit/bin/node.exe")
