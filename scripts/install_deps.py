@@ -6,6 +6,7 @@ import shutil
 import time
 from zipfile import ZipFile
 import argparse
+abspath = os.path.abspath
 
 def pip_install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -23,7 +24,7 @@ def download_and_extract(url, dst = "."):
 
 def tmp_path(path):
     """Return the path to the temporary directory."""
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), f"../tmp/{path}"))
+    return abspath(os.path.join(os.path.dirname(__file__), f"../tmp/{path}"))
 
 # --- Emscripten ---
 def install_deps_emscripten():
@@ -51,13 +52,13 @@ def install_deps_android_ndk():
     print("Installing Android NDK...\n")
     shutil.rmtree("android-tools", ignore_errors=True)
     if not "JAVA_HOME" in os.environ:
-        java_path = os.path.abspath("openjdk")
+        java_path = tmp_path("openjdk")
         os.environ["JAVA_HOME"] = java_path
     url = "https://dl.google.com/android/repository/commandlinetools-win-13114758_latest.zip"
     download_and_extract(url, ".")
     os.rename("cmdline-tools", "android-tools")
 
-    sdkmanager_path = os.path.abspath(tmp_path("android-tools/bin/sdkmanager.bat"))
+    sdkmanager_path = tmp_path("android-tools/bin/sdkmanager.bat")
 
     sdk_path = tmp_path("android_sdk")
     needToAcceptLicenses = True
