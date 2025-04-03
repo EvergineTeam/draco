@@ -20,9 +20,11 @@ jobs:
           submodules: recursive  # Ensure submodules are checked out
 
       - name: Install Dependencies
+        shell: pwsh
         run: python3 scripts/install_deps.py --all
 
       - name: Build project
+        shell: pwsh
         run: python3 scripts/build.py --emscripten_sdk=tmp/emsdk --ninja_path=tmp/ninja.exe --android_ndk=tmp/android_sdk/ndk/26.3.11.579264
 
       - name: Upload artifacts
