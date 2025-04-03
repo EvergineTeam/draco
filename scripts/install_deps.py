@@ -50,13 +50,13 @@ def install_deps_ninja():
 # --- Android SDK/NDK ---
 def install_deps_android_ndk():
     print("Installing Android NDK...\n")
-    shutil.rmtree("android-tools", ignore_errors=True)
+    shutil.rmtree(tmp_path("android-tools"), ignore_errors=True)
     if not "JAVA_HOME" in os.environ:
         java_path = tmp_path("openjdk")
         os.environ["JAVA_HOME"] = java_path
     url = "https://dl.google.com/android/repository/commandlinetools-win-13114758_latest.zip"
-    download_and_extract(url, ".")
-    os.rename("cmdline-tools", "android-tools")
+    download_and_extract(url, tmp_path(""))
+    os.rename(tmp_path("cmdline-tools"), tmp_path("android-tools"))
 
     sdkmanager_path = tmp_path("android-tools/bin/sdkmanager.bat")
 
@@ -89,7 +89,7 @@ def install_deps_java():
     shutil.rmtree(short_path, ignore_errors=True)
     
     url = "https://builds.openlogic.com/downloadJDK/openlogic-openjdk/21.0.6+7/openlogic-openjdk-21.0.6+7-windows-x64.zip"
-    download_and_extract(url, ".")
+    download_and_extract(url, tmp_path(""))
     os.rename(long_path, short_path)
     
 # --- Install dependencies ---
