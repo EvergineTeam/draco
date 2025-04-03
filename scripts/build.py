@@ -135,11 +135,12 @@ def build_wasm(EmscriptenSDKPath):
 def build_android(AndroidNDKPath, abi, abiFolder):
     print(f"Building for Android {abi}...\n")
     compilePath = rel_path(f"build/android/{abiFolder}")
+    toolchainFile = abspath(os.path.join(AndroidNDKPath, "build/cmake/android.toolchain.cmake"))
     cmake_cmd = [
         "cmake", ".",
         "-B", compilePath,
         "-G", "Ninja",
-        f"-DCMAKE_TOOLCHAIN_FILE={AndroidNDKPath}/build/cmake/android.toolchain.cmake",
+        f"-DCMAKE_TOOLCHAIN_FILE={toolchainFile}",
         "-DANDROID_TOOLCHAIN=clang",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS_RELEASE=-O3",
@@ -163,7 +164,7 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     if result.returncode != 0:
         return
 
-    llvm_strip = os.path.join(AndroidNDKPath, "toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip")
+    llvm_strip = abspath(os.path.join(AndroidNDKPath, "toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip"))
     strip_cmd = [
         llvm_strip,
         "-s", os.path.join(compilePath, "libdraco_tiny_dec.so")
@@ -172,7 +173,7 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     if result.returncode != 0:
         return
     
-    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.so")
+    srcPath = abspath(os.path.join(compilePath, "libdraco_tiny_dec.so"))
     dstPath = rel_path(f"build/OUT/runtimes/android-{abiFolder}/native/draco_tiny_dec.so")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
