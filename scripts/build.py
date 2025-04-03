@@ -204,8 +204,9 @@ if args.emscripten_sdk:
 
 if args.android_ndk:
     if not "JAVA_HOME" in os.environ:
-        java_path = abspath("openjdk")
+        java_path = abspath("openjdk/bin")
         os.environ["JAVA_HOME"] = java_path
+        os.environ["PATH"] = f"{java_path};{os.environ['PATH']}"
     build_android(args.android_ndk, "arm64-v8a", "arm64")
     build_android(args.android_ndk, "armeabi-v7a", "arm")
     build_android(args.android_ndk, "x86", "x86")
