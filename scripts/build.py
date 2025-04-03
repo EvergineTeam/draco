@@ -15,6 +15,7 @@ def rel_path(path):
     return os.path.join(os.path.dirname(__file__), f"../{path}")
 
 def build_windows(arch):
+    print(f"Building for Windows {arch}...\n")
     compilePath = rel_path(f"build/windows/{arch}")
     cmake_cmd = [
         "cmake",
@@ -39,6 +40,7 @@ def build_windows(arch):
     shutil.copy2(srcPath, dstPath)
 
 def build_mac():
+    print("Building for Mac...\n")
     arch = "x64" if platform.machine() == "x86_64" else "arm64"
     compilePath = rel_path(f"build/mac/{arch}")
     cmake_cmd = [
@@ -62,6 +64,7 @@ def build_mac():
     shutil.copy2(srcPath, dstPath)
 
 def build_uwp(arch):
+    print(f"Building for UWP {arch}...\n")
     compilePath = rel_path(f"build/uwp/{arch}")
     cmake_cmd = [
         "cmake",
@@ -92,6 +95,7 @@ def build_uwp(arch):
     shutil.copy2(srcPath, dstPath)
 
 def build_wasm(EmscriptenSDKPath):
+    print("Building for WebAssembly...\n")
     emsdk_env = os.path.join(EmscriptenSDKPath, "emsdk_env.bat")
     subprocess.run([emsdk_env])
 
@@ -125,6 +129,7 @@ def build_wasm(EmscriptenSDKPath):
     shutil.copy2(srcPath, dstPath)
 
 def build_android(AndroidNDKPath, abi, abiFolder):
+    print(f"Building for Android {abi}...\n")
     compilePath = rel_path(f"build/android/{abiFolder}")
     cmake_cmd = [
         "cmake", ".",
