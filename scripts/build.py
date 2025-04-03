@@ -86,6 +86,9 @@ def build_uwp(arch):
     shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
 
 def build_wasm(EmscriptenSDKPath):
+    emsdk_env = os.path.join(EmscriptenSDKPath, "emsdk_env.bat")
+    subprocess.run([emsdk_env])
+
     compilePath = "build/wasm"
     cmake_cmd = [
         "cmake",
