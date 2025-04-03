@@ -11,8 +11,11 @@ from pathlib import Path
 
 archTransltionStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}
 
+def rel_path(path):
+    return os.path.join(os.path.dirname(__file__), f"../{path}")
+
 def build_windows(arch):
-    compilePath = f"build/windows/{arch}"
+    compilePath = rel_path(f"build/windows/{arch}")
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
@@ -30,13 +33,14 @@ def build_windows(arch):
 
     archStr = archTransltionStr[arch]
 
-    dstPath = f"build/OUT/runtimes/win-{archStr}/native/draco_tiny_dec.dll"
+    srcPath = os.path.join(compilePath, "Release/draco_tiny_dec.dll")
+    dstPath = rel_path(f"build/OUT/runtimes/win-{archStr}/native/draco_tiny_dec.dll")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
+    shutil.copy2(srcPath, dstPath)
 
 def build_mac():
     arch = "x64" if platform.machine() == "x86_64" else "arm64"
-    compilePath = f"build/mac/{arch}"
+    compilePath = rel_path(f"build/mac/{arch}")
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
@@ -52,12 +56,13 @@ def build_mac():
     if result.returncode != 0:
         return
     
+    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.dylib")
     dstPath = f"build/OUT/runtimes/osx-{arch}/native/libdraco_tiny_dec.dylib"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/libdraco_tiny_dec.dylib", dstPath)
+    shutil.copy2(srcPath, dstPath)
 
 def build_uwp(arch):
-    compilePath = f"build/uwp/{arch}"
+    compilePath = rel_path(f"build/uwp/{arch}")
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
@@ -81,15 +86,16 @@ def build_uwp(arch):
     
     archStr = archTransltionStr[arch]
 
-    dstPath = f"build/OUT/runtimes/win-{archStr}/nativeassets/uap10.0/draco_tiny_dec.dll"
+    srcPath = os.path.join(compilePath, "Release/draco_tiny_dec.dll")
+    dstPath = rel_path(f"build/OUT/runtimes/win-{archStr}/nativeassets/uap10.0/draco_tiny_dec.dll")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/Release/draco_tiny_dec.dll", dstPath)
+    shutil.copy2(srcPath, dstPath)
 
 def build_wasm(EmscriptenSDKPath):
     emsdk_env = os.path.join(EmscriptenSDKPath, "emsdk_env.bat")
     subprocess.run([emsdk_env])
 
-    compilePath = "build/wasm"
+    compilePath = rel_path("build/wasm")
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
@@ -113,12 +119,13 @@ def build_wasm(EmscriptenSDKPath):
     if result.returncode != 0:
         return
     
-    dstPath = "build/OUT/runtimes/browser-wasm/draco_tiny_dec.a"
+    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.a")
+    dstPath = rel_path("build/OUT/runtimes/browser-wasm/draco_tiny_dec.a")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/libdraco_tiny_dec.a", dstPath)
+    shutil.copy2(srcPath, dstPath)
 
 def build_android(AndroidNDKPath, abi, abiFolder):
-    compilePath = f"build/android/{abiFolder}"
+    compilePath = rel_path(f"build/android/{abiFolder}")
     cmake_cmd = [
         "cmake", ".",
         "-B", compilePath,
@@ -147,17 +154,19 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     if result.returncode != 0:
         return
 
+    llvm_strip = os.path.join(AndroidNDKPath, "toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip")
     strip_cmd = [
-        f"{AndroidNDKPath}/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-strip",
-        "-s", f"{compilePath}/libdraco_tiny_dec.so"
+        llvm_strip,
+        "-s", os.path.join(compilePath, "libdraco_tiny_dec.so")
     ]
     result = subprocess.run(strip_cmd)
     if result.returncode != 0:
         return
     
-    dstPath = f"build/OUT/runtimes/android-{abiFolder}/native/draco_tiny_dec.so"
+    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.so")
+    dstPath = rel_path(f"build/OUT/runtimes/android-{abiFolder}/native/draco_tiny_dec.so")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(f"{compilePath}/libdraco_tiny_dec.so", dstPath)
+    shutil.copy2(srcPath, dstPath)
 
 
 parser = argparse.ArgumentParser()

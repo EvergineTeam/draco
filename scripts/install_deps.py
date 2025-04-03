@@ -21,17 +21,21 @@ def download_and_extract(url, dst = "."):
         with ZipFile(io.BytesIO(r.raw.read()), "r") as zip_ref:
             zip_ref.extractall(dst)
 
+def tmp_path(path):
+    """Return the path to the temporary directory."""
+    return os.path.join(os.path.dirname(__file__), f"../tmp/{path}")
+
 # --- Emscripten ---
 def install_deps_emscripten():
     print("Installing Emscripten...\n")
     emsdk_url = "https://github.com/emscripten-core/emsdk/archive/master.zip"
     download_and_extract(emsdk_url, ".")
     os.rename(
-        os.path.join(os.path.dirname(__file__), "../tmp/emsdk-master"),
-        os.path.join(os.path.dirname(__file__), "../tmp/emsdk"))
+        tmp_path("emsdk-master"),
+        tmp_path("emsdk"))
 
     # Run Emscripten commands
-    emsdk_bat = os.path.join(os.path.dirname(__file__), "../tmp/emsdk/emsdk.bat")
+    emsdk_bat = tmp_path("emsdk/emsdk.bat")
     os.system(f"{emsdk_bat} update")
     os.system(f"{emsdk_bat} install latest")
     os.system(f"{emsdk_bat} activate latest")
@@ -53,9 +57,9 @@ def install_deps_android_ndk():
     download_and_extract(url, ".")
     os.rename("cmdline-tools", "android-tools")
 
-    sdkmanager_path = os.path.join(os.path.dirname(__file__), "../tmp/android-tools/bin/sdkmanager.bat")
+    sdkmanager_path = tmp_path("android-tools/bin/sdkmanager.bat")
 
-    sdk_path = os.path.join(os.path.dirname(__file__), "../tmp/android_sdk")
+    sdk_path = tmp_path("android_sdk")
     needToAcceptLicenses = True
     if needToAcceptLicenses:
         process = subprocess.Popen([sdkmanager_path, f"--licenses", f"--sdk_root={sdk_path}"],
@@ -78,8 +82,8 @@ def install_deps_android_ndk():
 def install_deps_java():
     print("Installing OpenJDK...\n")
 
-    long_path = os.path.join(os.path.dirname(__file__), "../tmp/openlogic-openjdk-21.0.6+7-windows-x64")
-    short_path = os.path.join(os.path.dirname(__file__), "../tmp/openjdk")
+    long_path = tmp_path("openlogic-openjdk-21.0.6+7-windows-x64")
+    short_path = tmp_path("openjdk")
     shutil.rmtree(long_path, ignore_errors=True)
     shutil.rmtree(short_path, ignore_errors=True)
     
@@ -91,7 +95,7 @@ def install_deps_java():
 def install_deps(emscripten, ninja, android_ndk, java):
     try:
         # Define the temporary folder path
-        tmp_folder = os.path.join(os.path.dirname(__file__), "../tmp")
+        tmp_folder = tmp_path("")
         os.makedirs(tmp_folder, exist_ok=True)
         os.chdir(tmp_folder)
 
