@@ -12,7 +12,7 @@ from pathlib import Path
 archTransltionStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}
 
 def build_windows(arch):
-    compilePath = "build/windows/{arch}"
+    compilePath = f"build/windows/{arch}"
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
@@ -94,9 +94,13 @@ def build_wasm(EmscriptenSDKPath):
         "-DCMAKE_BUILD_TYPE=Release",
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         f"-DCMAKE_TOOLCHAIN_FILE={EmscriptenSDKPath}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
-        f"-DCMAKE_CROSSCOMPILING_EMULATOR={EmscriptenSDKPath}/node/16.20.0_64bit/bin/node.exe",
+        f"-DCMAKE_CROSSCOMPILING_EMULATOR={EmscriptenSDKPath}/node/20.18.0_64bit/bin/node.exe",
         "-DDRACO_WASM=ON"
     ]
+    if ninjaExePath:
+        ninjaExePath_absolute = os.path.abspath(ninjaExePath)
+        cmake_cmd.append(f"-DCMAKE_MAKE_PROGRAM={ninjaExePath_absolute}")
+        
     result = subprocess.run(cmake_cmd)
     if result.returncode != 0:
         return
@@ -106,7 +110,7 @@ def build_wasm(EmscriptenSDKPath):
     if result.returncode != 0:
         return
     
-    dstPath = "build/OUT/build/wasm/draco_tiny_dec.a"
+    dstPath = "build/OUT/runtimes/browser-wasm/draco_tiny_dec.a"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(f"{compilePath}/libdraco_tiny_dec.a", dstPath)
 
@@ -153,7 +157,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("--emscripten_sdk", help = "Path to the Emscripten SDK install dir")
 parser.add_argument("--android_ndk", help = "Path to the Android NDK install dir")
+parser.add_argument("--ninja_path", help = "Path to the ninja executable")
 args = parser.parse_args()
+
+ninjaExePath = args.ninja_path
 
 if os.name == 'nt':
     build_windows("Win32")
@@ -170,6 +177,9 @@ if args.emscripten_sdk:
     build_wasm(args.emscripten_sdk)
 
 if args.android_ndk:
+    if not "JAVA_HOME" in os.environ:
+        java_path = os.path.abspath("openjdk")
+        os.environ["JAVA_HOME"] = java_path
     build_android(args.android_ndk, "arm64-v8a", "arm64")
     build_android(args.android_ndk, "armeabi-v7a", "arm")
     build_android(args.android_ndk, "x86", "x86")
