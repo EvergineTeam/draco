@@ -134,6 +134,10 @@ def build_android(AndroidNDKPath, abi, abiFolder):
 
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON"
     ]
+    if ninjaExePath:
+        ninjaExePath_absolute = os.path.abspath(ninjaExePath)
+        cmake_cmd.append(f"-DCMAKE_MAKE_PROGRAM={ninjaExePath_absolute}")
+
     result = subprocess.run(cmake_cmd)
     if result.returncode != 0:
         return
