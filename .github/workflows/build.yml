@@ -25,7 +25,7 @@ jobs:
 
       - name: Build project
         shell: pwsh
-        run: python3 -u scripts/build.py --emscripten_sdk=tmp/emsdk --ninja_path=tmp/ninja.exe --android_ndk=tmp/android_sdk/ndk/26.3.11.579264
+        run: python3 -u scripts/build.py --emscripten_sdk=tmp/emsdk --ninja_path=tmp/ninja.exe --android_ndk=tmp/android_sdk/ndk/26.3.11579264
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

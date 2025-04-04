@@ -11,15 +11,6 @@ abspath = os.path.abspath
 def pip_install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-def list_files(startpath):
-    for root, dirs, files in os.walk(startpath):
-        level = root.replace(startpath, '').count(os.sep)
-        indent = ' ' * 4 * (level)
-        print('{}{}/'.format(indent, os.path.basename(root)))
-        subindent = ' ' * 4 * (level + 1)
-        for f in files:
-            print('{}{}'.format(subindent, f))
-
 pip_install("requests")
 import requests # we need requests in order to download emsdk and ninja
 
@@ -95,7 +86,6 @@ def install_deps_android_ndk():
         stderr=subprocess.PIPE)
     out, err = process.communicate()
     print(out.decode())
-    list_files(sdk_path)
 
 # --- Java ---
 def install_deps_java():
