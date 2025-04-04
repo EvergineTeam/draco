@@ -60,7 +60,7 @@ def install_deps_ninja():
 def install_deps_android_ndk():
     print("Installing Android NDK...\n")
 
-    if not "JAVA_HOME" in os.environ:
+    if True or not "JAVA_HOME" in os.environ:
         java_path = tmp_path("openjdk")
         os.environ["JAVA_HOME"] = java_path
         os.environ["PATH"] = f"{java_path};{os.environ['PATH']}"
