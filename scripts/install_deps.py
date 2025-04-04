@@ -64,7 +64,10 @@ def install_deps_android_ndk():
         java_path = tmp_path("openjdk")
         os.environ["JAVA_HOME"] = java_path
         os.environ["PATH"] = f"{java_path};{os.environ['PATH']}"
-        subprocess.call(["java", "-version"])
+        subprocess.Popen(["java.exe", "-version"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
 
     shutil.rmtree(tmp_path("android-tools"), ignore_errors=True)
     url = "https://dl.google.com/android/repository/commandlinetools-win-13114758_latest.zip"
