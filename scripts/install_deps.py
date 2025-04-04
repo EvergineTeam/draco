@@ -59,10 +59,13 @@ def install_deps_ninja():
 # --- Android SDK/NDK ---
 def install_deps_android_ndk():
     print("Installing Android NDK...\n")
-    shutil.rmtree(tmp_path("android-tools"), ignore_errors=True)
+
     if not "JAVA_HOME" in os.environ:
         java_path = tmp_path("openjdk")
         os.environ["JAVA_HOME"] = java_path
+        os.environ["PATH"] = f"{java_path};{os.environ['PATH']}"
+
+    shutil.rmtree(tmp_path("android-tools"), ignore_errors=True)
     url = "https://dl.google.com/android/repository/commandlinetools-win-13114758_latest.zip"
     download_and_extract(url, tmp_path(""))
     os.rename(tmp_path("cmdline-tools"), tmp_path("android-tools"))
