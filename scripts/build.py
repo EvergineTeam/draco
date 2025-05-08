@@ -71,7 +71,7 @@ def build_ios_arm64():
         "cmake",
         "-B", compilePath,
         "-G", "Xcode",
-        "-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/ios.toolchain.cmake",
+        f'-DCMAKE_TOOLCHAIN_FILE={rel_path("cmake/toolchains/ios.toolchain.cmake")}',
         "-DPLATFORM=OS64",
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         "-DCMAKE_BUILD_TYPE=Release",
