@@ -11,7 +11,7 @@ on:
 
 jobs:
     
-  windows:
+  in-windows:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -33,7 +33,7 @@ jobs:
           name: windows_wasm_android
           path: build/OUT/*
 
-  mac-x64:
+  in-mac-x64:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
@@ -51,7 +51,7 @@ jobs:
           name: mac_x64
           path: build/OUT/*
 
-  mac-arm64:
+  in-mac-arm64:
     runs-on: macos-arm64-latest
     steps:
       - name: Checkout repository
@@ -61,28 +61,10 @@ jobs:
 
       - name: Build project
         shell: pwsh
-        run: python3 -u scripts/build.py
+        run: python3 -u scripts/build.py --ios
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mac_arm64
-          path: build/OUT/*
-
-  ios-arm64:
-    runs-on: macos-arm64-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive  # Ensure submodules are checked out
-
-      - name: Build project
-        shell: pwsh
-        run: python3 -u scripts/build.py
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-arm64
           path: build/OUT/*

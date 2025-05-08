@@ -209,6 +209,7 @@ parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("--emscripten_sdk", help = "Path to the Emscripten SDK install dir")
 parser.add_argument("--android_ndk", help = "Path to the Android NDK install dir")
 parser.add_argument("--ninja_path", help = "Path to the ninja executable")
+parser.add_argument("--ios", action="store_true", help = "Build for iOS arm64")
 args = parser.parse_args()
 
 ninjaExePath = args.ninja_path
@@ -218,7 +219,8 @@ if os.name == 'nt':
     build_windows("x64")
 elif platform.system() == 'Darwin':
     build_mac()
-    build_ios()
+    if args.ios:
+        build_ios_arm64()
 
 #build_uwp("Win32")
 #build_uwp("x64")
