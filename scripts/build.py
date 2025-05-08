@@ -64,6 +64,32 @@ def build_mac():
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+def build_ios_arm64():
+    print("Building for iOS arm64...\n")
+    compilePath = rel_path("build/ios-arm64")
+    cmake_cmd = [
+        "cmake",
+        "-B", compilePath,
+        "-G", "Xcode",
+        "-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/ios.toolchain.cmake",
+        "-DPLATFORM=OS64",
+        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+    ]
+    result = subprocess.run(cmake_cmd)
+    if result.returncode != 0:
+        return
+    
+    build_cmd = ["cmake", "--build", compilePath, "--config", "Release"]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+    
+    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.dylib")
+    dstPath = rel_path("build/OUT/runtimes/ios-arm64/libdraco_tiny_dec.dylib")
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(srcPath, dstPath)
+
 def build_uwp(arch):
     print(f"Building for UWP {arch}...\n")
     compilePath = rel_path(f"build/uwp/{arch}")
@@ -178,7 +204,6 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("--emscripten_sdk", help = "Path to the Emscripten SDK install dir")
@@ -193,6 +218,7 @@ if os.name == 'nt':
     build_windows("x64")
 elif platform.system() == 'Darwin':
     build_mac()
+    build_ios()
 
 #build_uwp("Win32")
 #build_uwp("x64")
