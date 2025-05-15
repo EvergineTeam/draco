@@ -94,7 +94,9 @@ def build_ios_arm64(ios_platform):
     if result.returncode != 0:
         return
     
-    srcPath = os.path.join(compilePath, f"Release-iphoneos", "libdraco_tiny_dec.dylib")
+    srcPath = os.path.join(compilePath,
+        f"Release-iphoneos" if ios_platform == "OS64" else "Release-iphonesimulator",
+        "libdraco_tiny_dec.dylib")
     dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/libdraco_tiny_dec.dylib")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
