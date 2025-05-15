@@ -67,7 +67,7 @@ def build_mac():
 def build_ios_arm64(ios_platform):
     ios_platforms = {
         "OS64" : "ios-arm64",
-        "OS64COMBINED": "iossimulator-arm64",
+        "SIMULATORARM64": "iossimulator-arm64",
     }
     if not ios_platform in ios_platforms.keys():
         print(f"Invalid iOS platform({ios_platform}). Valid values are {ios_platforms.keys()}")
@@ -230,7 +230,7 @@ elif platform.system() == 'Darwin':
     build_mac()
     if args.ios:
         build_ios_arm64("OS64")
-        build_ios_arm64("OS64COMBINED")
+        build_ios_arm64("SIMULATORARM64")
 
 #build_uwp("Win32")
 #build_uwp("x64")
