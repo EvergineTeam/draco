@@ -74,8 +74,8 @@ def build_ios_arm64(ios_platform):
         return
     runtimesFolderName = ios_platforms[ios_platform]
 
-    print("Building for iOS arm64...\n")
-    compilePath = rel_path("build/ios-arm64")
+    print(f"Building for {runtimesFolderName} ...\n")
+    compilePath = rel_path(f"build/{runtimesFolderName}")
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
