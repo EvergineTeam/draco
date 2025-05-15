@@ -64,7 +64,16 @@ def build_mac():
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
-def build_ios_arm64():
+def build_ios_arm64(ios_platform):
+    ios_platforms = {
+        "OS64" : "ios-arm64",
+        "OS64COMBINED": "iossimulator-arm64",
+    }
+    if not ios_platform in ios_platforms.keys():
+        print(f"Invalid iOS platform({ios_platform}). Valid values are {ios_platforms.keys()}")
+        return
+    runtimesFolderName = ios_platforms[ios_platform]
+
     print("Building for iOS arm64...\n")
     compilePath = rel_path("build/ios-arm64")
     cmake_cmd = [
@@ -72,7 +81,7 @@ def build_ios_arm64():
         "-B", compilePath,
         "-G", "Xcode",
         f'-DCMAKE_TOOLCHAIN_FILE={rel_path("cmake/toolchains/ios.toolchain.cmake")}',
-        "-DPLATFORM=OS64",
+        f"-DPLATFORM={ios_platform}",
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         "-DCMAKE_BUILD_TYPE=Release",
     ]
@@ -86,7 +95,7 @@ def build_ios_arm64():
         return
     
     srcPath = os.path.join(compilePath, f"Release-iphoneos", "libdraco_tiny_dec.dylib")
-    dstPath = rel_path("build/OUT/runtimes/ios-arm64/libdraco_tiny_dec.dylib")
+    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/libdraco_tiny_dec.dylib")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
@@ -220,7 +229,8 @@ if os.name == 'nt':
 elif platform.system() == 'Darwin':
     build_mac()
     if args.ios:
-        build_ios_arm64()
+        build_ios_arm64("OS64")
+        build_ios_arm64("OS64COMBINED")
 
 #build_uwp("Win32")
 #build_uwp("x64")
