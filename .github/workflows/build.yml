@@ -73,3 +73,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux
+          path: build/OUT/*
+          if-no-files-found: warn # 'warn' or 'ignore' or 'error'
