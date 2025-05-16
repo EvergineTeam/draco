@@ -62,6 +62,9 @@ jobs:
       - name: Setup Ninja
         uses: ashutoshvarma/setup-ninja@v1.1
 
+      - name: Install Cross-Compilation Tools for ARM64
+        run: sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
       - name: Build project
         shell: bash
         run: python3 -u scripts/build.py
