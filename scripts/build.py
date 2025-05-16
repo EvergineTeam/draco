@@ -62,7 +62,7 @@ def build_mac():
         return
     
     srcPath = os.path.join(compilePath, "libdraco_tiny_dec.dylib")
-    dstPath = f"build/OUT/runtimes/osx-{arch}/native/libdraco_tiny_dec.dylib"
+    dstPath = f"build/OUT/runtimes/osx-{arch}/native/draco_tiny_dec.dylib"
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
@@ -100,7 +100,7 @@ def build_ios_arm64(ios_platform):
     srcPath = os.path.join(compilePath,
         f"Release-iphoneos" if ios_platform == "OS64" else "Release-iphonesimulator",
         "libdraco_tiny_dec.dylib")
-    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/libdraco_tiny_dec.dylib")
+    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/native/draco_tiny_dec.dylib")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
@@ -170,7 +170,7 @@ def build_wasm(EmscriptenSDKPath):
         return
     
     srcPath = abspath(os.path.join(compilePath, "libdraco_tiny_dec.a"))
-    dstPath = rel_path("build/OUT/runtimes/browser-wasm/draco_tiny_dec.a")
+    dstPath = rel_path("build/OUT/runtimes/browser-wasm/native/draco_tiny_dec.a")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
