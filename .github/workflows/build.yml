@@ -59,6 +59,9 @@ jobs:
         with:
           submodules: recursive  # Ensure submodules are checked out
 
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@v1.1
+
       - name: Build project
         shell: bash
         run: python3 -u scripts/build.py

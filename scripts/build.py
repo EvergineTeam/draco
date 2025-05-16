@@ -230,6 +230,7 @@ def build_linux(arch):
         "-B", compilePath,
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
         "-DCMAKE_BUILD_TYPE=Release",
+        "-GNinja",
         "-A", arch
     ]
     if platform.machine() == "x86_64" and arch == "ARM64":
