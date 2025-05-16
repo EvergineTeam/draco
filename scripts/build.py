@@ -15,6 +15,7 @@ archTransltionStr = {"Win32":"x86", "x64":"x64", "ARM":"arm", "ARM64":"arm64"}
 def rel_path(path):
     return abspath(os.path.join(os.path.dirname(__file__), f"../{path}"))
 
+# --- Windows ---
 def build_windows(arch):
     print(f"Building for Windows {arch}...\n")
     compilePath = rel_path(f"build/windows/{arch}")
@@ -40,6 +41,7 @@ def build_windows(arch):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- MacOS ---
 def build_mac():
     print("Building for Mac...\n")
     arch = "x64" if platform.machine() == "x86_64" else "arm64"
@@ -64,6 +66,7 @@ def build_mac():
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- IOS ---
 def build_ios_arm64(ios_platform):
     ios_platforms = {
         "OS64" : "ios-arm64",
@@ -101,6 +104,7 @@ def build_ios_arm64(ios_platform):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- UWP ---
 def build_uwp(arch):
     print(f"Building for UWP {arch}...\n")
     compilePath = rel_path(f"build/uwp/{arch}")
@@ -132,6 +136,7 @@ def build_uwp(arch):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- Wasm ---
 def build_wasm(EmscriptenSDKPath):
     print("Building for WebAssembly...\n")
     emsdk_env = os.path.abspath(os.path.join(EmscriptenSDKPath, "emsdk_env.bat"))
@@ -169,6 +174,7 @@ def build_wasm(EmscriptenSDKPath):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- Android ---
 def build_android(AndroidNDKPath, abi, abiFolder):
     print(f"Building for Android {abi}...\n")
     compilePath = rel_path(f"build/android/{abiFolder}")
@@ -215,6 +221,40 @@ def build_android(AndroidNDKPath, abi, abiFolder):
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
+# --- Linux ---
+def build_linux(arch):
+    print(f"Building for Linux {arch}...\n")
+    compilePath = rel_path(f"build/linux/{arch}")
+    cmake_cmd = [
+        "cmake",
+        "-B", compilePath,
+        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-A", arch
+    ]
+    if platform.machine() == "x86_64" and arch == "ARM64":
+        cmake_cmd += [ # crosscompiling
+            "-DCMAKE_SYSTEM_PROCESSOR=aarch64",
+            "-DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc",
+            "-DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++",
+        ]
+
+    result = subprocess.run(cmake_cmd)
+    if result.returncode != 0:
+        return
+    
+    build_cmd = ["cmake", "--build", compilePath, "--config", "Release",]
+    result = subprocess.run(build_cmd)
+    if result.returncode != 0:
+        return
+    
+    archStr = archTransltionStr[arch]
+
+    srcPath = os.path.join(compilePath, "libdraco_tiny_dec.so")
+    dstPath = rel_path(f"build/OUT/runtimes/linux-{archStr}/native/draco_tiny_dec.so")
+    os.makedirs(os.path.dirname(dstPath), exist_ok=True)
+    shutil.copy2(srcPath, dstPath)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("--emscripten_sdk", help = "Path to the Emscripten SDK install dir")
@@ -233,6 +273,9 @@ elif platform.system() == 'Darwin':
     if args.ios:
         build_ios_arm64("OS64")
         build_ios_arm64("SIMULATORARM64")
+elif platform.system() == 'Linux':
+    build_linux("x64")
+    build_linux("ARM64")
 
 #build_uwp("Win32")
 #build_uwp("x64")
