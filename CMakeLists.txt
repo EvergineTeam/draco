@@ -540,8 +540,8 @@ list(APPEND draco_unity_plug_sources
             "${draco_src_root}/unity/draco_unity_plugin.cc"
             "${draco_src_root}/unity/draco_unity_plugin.h")
 
-list(APPEND draco_tiny_decode_shared_lib_sources
-            "${draco_src_root}/shared_lib/draco_shared_lib.cc")
+list(APPEND DRACO_TINY_LIB_sources
+            "${draco_src_root}/tiny_lib/draco_tiny_lib.cc")
 
 list(APPEND draco_maya_plug_sources
             "${draco_src_root}/maya/draco_maya_plugin.cc"
@@ -764,11 +764,17 @@ if(EMSCRIPTEN AND DRACO_JS_GLUE)
       POST_LINK_JS_SOURCES ${draco_post_link_js_sources})
   endif()
 
-  if(DRACO_TINY_DECODE_SHARED_LIB)
+  if(DRACO_TINY_LIB)
+    if(DRACO_TINY_LIB_SHARED)
+      set(draco_tiny_lib_type SHARED)
+    else()
+      set(draco_tiny_lib_type STATIC)
+    endif()
+
     draco_add_library(
       NAME draco_tiny_dec
-      TYPE STATIC
-      SOURCES ${draco_tiny_decode_shared_lib_sources} ${draco_decoder_src}
+      TYPE ${draco_tiny_lib_type}
+      SOURCES ${DRACO_TINY_LIB_sources} ${draco_decoder_src}
       DEFINES ${draco_defines}
       INCLUDES ${draco_include_paths}
       LINK_FLAGS "-sWASM=1")
@@ -1096,11 +1102,11 @@ else()
     endif()
   endif()
 
-  if(DRACO_TINY_DECODE_SHARED_LIB)
+  if(DRACO_TINY_LIB)
     draco_add_library(
       NAME draco_tiny_dec
       TYPE SHARED
-      SOURCES ${draco_tiny_decode_shared_lib_sources}
+      SOURCES ${DRACO_TINY_LIB_sources}
       DEFINES ${draco_defines}
       INCLUDES ${draco_include_paths}
       LIB_DEPS ${draco_plugin_dependency})

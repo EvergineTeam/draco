@@ -22,7 +22,8 @@ def build_windows(arch):
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
         "-A", arch
     ]
     result = subprocess.run(cmake_cmd)
@@ -49,7 +50,8 @@ def build_mac():
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
         "-DCMAKE_BUILD_TYPE=Release",
     ]
     result = subprocess.run(cmake_cmd)
@@ -85,7 +87,8 @@ def build_ios_arm64(ios_platform):
         "-G", "Xcode",
         f'-DCMAKE_TOOLCHAIN_FILE={rel_path("cmake/toolchains/ios.toolchain.cmake")}',
         f"-DPLATFORM={ios_platform}",
-        "-DDRACO_TINY_DECODE_SHARED_LIB=OFF",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=OFF",
         "-DCMAKE_BUILD_TYPE=Release",
     ]
     result = subprocess.run(cmake_cmd)
@@ -112,7 +115,8 @@ def build_uwp(arch):
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
         "-DCMAKE_SYSTEM_NAME=WindowsStore",
         "-DCMAKE_SYSTEM_VERSION=10.0",
         "-DCMAKE_C_COMPILER_WORKS=FALSE",
@@ -154,7 +158,8 @@ def build_wasm(EmscriptenSDKPath):
         "-B", compilePath,
         "-GNinja",
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
         f"-DCMAKE_TOOLCHAIN_FILE={toolchainFile}",
         f"-DCMAKE_CROSSCOMPILING_EMULATOR={crosscompilingEmulator}",
         "-DDRACO_WASM=ON"
@@ -194,7 +199,8 @@ def build_android(AndroidNDKPath, abi, abiFolder):
         f"-DANDROID_ABI={abi}",
         "-DANDROID_PLATFORM=android-24",
         "-DANDROID_STL=c++_static",
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON"
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
     ]
     if ninjaExePath:
         ninjaExePath_absolute = abspath(ninjaExePath)
@@ -230,7 +236,8 @@ def build_linux(arch):
     cmake_cmd = [
         "cmake",
         "-B", compilePath,
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_LIB=ON",
+        "-DDRACO_TINY_LIB_SHARED=ON",
         "-DCMAKE_BUILD_TYPE=Release",
         "-GNinja",
     ]

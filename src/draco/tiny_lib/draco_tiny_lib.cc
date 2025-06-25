@@ -1,6 +1,6 @@
 #include "draco/draco_features.h"
 
-#ifdef DRACO_TINY_DECODE_SHARED_LIB
+#ifdef DRACO_TINY_LIB
 
 #include "draco/attributes/geometry_attribute.h"
 #include "draco/compression/decode.h"

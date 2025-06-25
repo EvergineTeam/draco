@@ -128,8 +128,8 @@ macro(draco_set_default_options)
     HELPSTRING "Build shared Draco libraries."
     VALUE OFF)
   draco_option(
-    NAME DRACO_TINY_DECODE_SHARED_LIB
-    HELPSTRING "Build a tiny shared lib with just a few C plain functions for decoding Draco."
+    NAME DRACO_TINY_LIB
+    HELPSTRING "Build a tiny lib with just a few C plain functions for decoding Draco."
     VALUE OFF)
   draco_option(
     NAME DRACO_TRANSCODER_SUPPORTED
@@ -244,8 +244,13 @@ macro(draco_set_optional_features)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   endif()
 
-  if(DRACO_TINY_DECODE_SHARED_LIB)
-    draco_enable_feature(FEATURE "DRACO_TINY_DECODE_SHARED_LIB")
+  if(DRACO_TINY_LIB)
+    draco_enable_feature(FEATURE "DRACO_TINY_LIB")
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  endif()
+
+  if(DRACO_TINY_LIB_SHARED)
+    draco_enable_feature(FEATURE "DRACO_TINY_LIB_SHARED")
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   endif()
 
