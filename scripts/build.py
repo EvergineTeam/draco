@@ -97,10 +97,11 @@ def build_ios_arm64(ios_platform):
     if result.returncode != 0:
         return
     
+    libName = "libdraco_tiny_dec.a"
     srcPath = os.path.join(compilePath,
         f"Release-iphoneos" if ios_platform == "OS64" else "Release-iphonesimulator",
-        "libdraco_tiny_dec.dylib")
-    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/native/draco_tiny_dec.dylib")
+        libName)
+    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/native/{libName}")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
     shutil.copy2(srcPath, dstPath)
 
@@ -193,7 +194,6 @@ def build_android(AndroidNDKPath, abi, abiFolder):
         f"-DANDROID_ABI={abi}",
         "-DANDROID_PLATFORM=android-24",
         "-DANDROID_STL=c++_static",
-
         "-DDRACO_TINY_DECODE_SHARED_LIB=ON"
     ]
     if ninjaExePath:
