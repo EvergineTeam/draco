@@ -144,7 +144,9 @@ def build_wasm(EmscriptenSDKPath):
     os.environ["EMSCRIPTEN"] = abspath(os.path.join(EmscriptenSDKPath, "upstream", "emscripten"))
 
     toolchainFile = abspath(f"{EmscriptenSDKPath}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
-    crosscompilingEmulator = abspath(f"{EmscriptenSDKPath}/node/20.18.0_64bit/bin/node.exe")
+    nodeDir = abspath(f"{EmscriptenSDKPath}/node")
+    nodeVersion = os.listdir(nodeDir)[0]
+    crosscompilingEmulator = os.path.join(nodeDir, nodeVersion, "/bin/node.exe")
     compilePath = rel_path("build/wasm")
     cmake_cmd = [
         "cmake",
