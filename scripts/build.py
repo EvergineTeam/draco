@@ -85,7 +85,7 @@ def build_ios_arm64(ios_platform):
         "-G", "Xcode",
         f'-DCMAKE_TOOLCHAIN_FILE={rel_path("cmake/toolchains/ios.toolchain.cmake")}',
         f"-DPLATFORM={ios_platform}",
-        "-DDRACO_TINY_DECODE_SHARED_LIB=ON",
+        "-DDRACO_TINY_DECODE_SHARED_LIB=OFF",
         "-DCMAKE_BUILD_TYPE=Release",
     ]
     result = subprocess.run(cmake_cmd)
