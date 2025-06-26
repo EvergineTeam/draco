@@ -100,13 +100,23 @@ def build_ios_arm64(ios_platform):
     if result.returncode != 0:
         return
     
-    libName = "libdraco_tiny_dec.a"
-    srcPath = os.path.join(compilePath,
-        f"Release-iphoneos" if ios_platform == "OS64" else "Release-iphonesimulator",
-        libName)
-    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/native/{libName}")
+
+    # amalgamete static library
+    compilePath = os.path.join(compilePath,
+        f"Release-iphoneos" if ios_platform == "OS64" else "Release-iphonesimulator")
+    dracoPath = os.path.join(compilePath, "libdraco.a")
+    tinyDecPath = os.path.join(compilePath, "libdraco_tiny_dec.a")
+    amalgamatedPath = os.path.join(compilePath, "libdraco_tiny_dec_amalgamated.a")
+    amalgamate_cmd = ["libtool", "-static", "-o", amalgamatedPath, tinyDecPath, dracoPath]
+    result = subprocess.run(amalgamate_cmd)
+    if result.returncode != 0:
+        print("Failed to amalgamate the static libraries.")
+        return
+
+    # copy to OUT folder
+    dstPath = rel_path(f"build/OUT/runtimes/{runtimesFolderName}/native/libdraco_tiny_dec.a")
     os.makedirs(os.path.dirname(dstPath), exist_ok=True)
-    shutil.copy2(srcPath, dstPath)
+    shutil.copy2(amalgamatedPath, dstPath)
 
 # --- UWP ---
 def build_uwp(arch):
