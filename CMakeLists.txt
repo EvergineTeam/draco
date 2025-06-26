@@ -1101,11 +1101,17 @@ else()
       set_target_properties(dracodec_unity PROPERTIES BUNDLE true)
     endif()
   endif()
+  
+    if(DRACO_TINY_LIB_SHARED)
+      set(draco_tiny_lib_type SHARED)
+    else()
+      set(draco_tiny_lib_type STATIC)
+    endif()
 
   if(DRACO_TINY_LIB)
     draco_add_library(
       NAME draco_tiny_dec
-      TYPE SHARED
+      TYPE ${draco_tiny_lib_type}
       SOURCES ${DRACO_TINY_LIB_sources}
       DEFINES ${draco_defines}
       INCLUDES ${draco_include_paths}
